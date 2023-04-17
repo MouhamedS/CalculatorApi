@@ -1,14 +1,23 @@
 package com.example.calculator.api.service;
 
+import java.util.Collection;
 import java.util.Deque;
+import java.util.Map;
+import java.util.Set;
 
 public interface CalculatorService {
 
-    Deque getStack();
+    Map<String, Deque<Integer>> getStringDequeMap();
+    Collection<Deque<Integer>> listStacks();
 
-    Deque push(Integer integer);
+    Set<String> listStackId();
+    String createStack();
+    Deque getStack(String id);
 
-    void clearStack();
+    Deque push(String id, Integer integer);
 
-    Deque applyOperator(String operator) throws Exception;
+
+    void deleteStack(String id);
+
+    Deque applyOperator(String id, String operator) throws Exception;
 }

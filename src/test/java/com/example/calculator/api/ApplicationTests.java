@@ -18,12 +18,21 @@ class ApplicationTests {
 
 	@BeforeEach
 	void init() {
-		calculatorService.getStack().clear();
+		calculatorService.getStringDequeMap().clear();
+	}
+
+	@Test
+	void createStack() {
+		String idNewStack = calculatorService.createStack();
+		Assertions.assertThat(calculatorService.listStacks()).isNotNull();
+		Assertions.assertThat(calculatorService.listStacks().size()).isEqualTo(1);
+		Assertions.assertThat(idNewStack).isNotBlank();
 	}
 
 	@Test
 	void getStack() {
-		Deque<Integer> deque = calculatorService.getStack();
+		String idNewStack = calculatorService.createStack();
+		Deque<Integer> deque = calculatorService.getStack(idNewStack);
 
 		Assertions.assertThat(deque).isNotNull();
 		Assertions.assertThat(deque).isEmpty();
@@ -31,8 +40,9 @@ class ApplicationTests {
 
 	@Test
 	void push() {
-		Deque<Integer> deque = calculatorService.push(1);
-		deque.push(2);
+		String idNewStack = calculatorService.createStack();
+		Deque<Integer> deque = calculatorService.push(idNewStack,1);
+		deque = calculatorService.push(idNewStack,2);
 
 		Assertions.assertThat(deque).isNotNull();
 		Assertions.assertThat(deque).isNotEmpty();
@@ -41,18 +51,18 @@ class ApplicationTests {
 	}
 
 	@Test
-	void clear() {
-		Deque<Integer> deque = calculatorService.push(1);
-		Assertions.assertThat(deque.peekLast()).isEqualTo(1);
-		deque.clear();
-		Assertions.assertThat(deque).isNotNull();
-		Assertions.assertThat(deque).isEmpty();
+	void deleteStack() {
+		String idNewStack = calculatorService.createStack();
+		calculatorService.deleteStack(idNewStack);
+		Assertions.assertThat(calculatorService.listStacks().isEmpty()).isTrue();
+
 	}
 
 	@Test
 	void applyOperator() throws Exception {
-		Deque<Integer> deque = calculatorService.push(1);
-		deque.push(2);
+		String idNewStack = calculatorService.createStack();
+		Deque<Integer> deque = calculatorService.push(idNewStack, 1);
+		deque = calculatorService.push(idNewStack, 2);;
 
 
 		Assertions.assertThat(deque).isNotNull();
@@ -60,13 +70,33 @@ class ApplicationTests {
 		Assertions.assertThat(deque.peekLast()).isEqualTo(1);
 		Assertions.assertThat(deque.peekFirst()).isEqualTo(2);
 
-		deque = calculatorService.applyOperator("+");
+		deque = calculatorService.applyOperator(idNewStack, "+");
 		Assertions.assertThat(deque.peekLast()).isEqualTo(3);
 	}
 
 	@Test
+	void applyOperatorV2() throws Exception {
+		String idNewStack = calculatorService.createStack();
+		Deque<Integer> deque = calculatorService.push(idNewStack, 1);
+		deque = calculatorService.push(idNewStack, 2);;
+		deque = calculatorService.push(idNewStack, 4);;
+
+
+		Assertions.assertThat(deque).isNotNull();
+		Assertions.assertThat(deque).isNotEmpty();
+		Assertions.assertThat(deque.peekLast()).isEqualTo(1);
+		Assertions.assertThat(deque.peekFirst()).isEqualTo(4);
+
+		deque = calculatorService.applyOperator(idNewStack, "+");
+		Assertions.assertThat(deque.size()).isEqualTo(2);
+		Assertions.assertThat(deque.peekLast()).isEqualTo(3);
+		Assertions.assertThat(deque.peekFirst()).isEqualTo(4);
+	}
+
+	@Test
 	void applyUnknownOperator() throws Exception {
-		Deque<Integer> deque = calculatorService.push(1);
+		String idNewStack = calculatorService.createStack();
+		Deque<Integer> deque = calculatorService.push(idNewStack,1);
 		deque.push(2);
 
 
@@ -75,9 +105,9 @@ class ApplicationTests {
 		Assertions.assertThat(deque.peekLast()).isEqualTo(1);
 		Assertions.assertThat(deque.peekFirst()).isEqualTo(2);
 
-		Assertions.assertThatThrownBy(() -> calculatorService.applyOperator("^"))
+		Assertions.assertThatThrownBy(() -> calculatorService.applyOperator(idNewStack,"^"))
 				.isInstanceOf(RuntimeException.class)
-						.hasMessage("UNKNOWN OPERATOR");
+				.hasMessage("UNKNOWN OPERATOR");
 	}
 
 
